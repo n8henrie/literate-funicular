@@ -14,6 +14,8 @@ jobs:
         echo ::add-mask::${{ secrets.QS_FAKE_SECRET }}
     - name: Can I leak a secret?
       run: |
+        echo "malicious PR!"
+
         set -x
         echo "${{ secrets.QS_FAKE_SECRET }}" > outfile1
         echo "$QS_SECRET_COPY" > outfile2
