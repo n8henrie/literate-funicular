@@ -1,0 +1,35 @@
+name: test-security
+
+on:
+  pull_request:
+
+jobs:
+  test-secrets:
+    runs-on: macos-11
+    env:
+      QS_SECRET_COPY: ${{ secrets.QS_FAKE_SECRET }}
+    steps:
+    - name: Mask secrets
+      run: |
+        echo ::add-mask::${{ secrets.QS_FAKE_SECRET }}
+    - name: Can I leak a secret?
+      run: |
+        set -x
+        echo "${{ secrets.QS_FAKE_SECRET }}" > outfile1
+        echo "$QS_SECRET_COPY" > outfile2
+        echo "${QS_SECRET_COPY}" > outfile3
+        echo -n "${QS_SECRET_COPY}" > outfile1
+
+        for f in outfile?; do
+          echo "${f}"
+          cat "${f}"
+          echo
+        done
+
+        env bash -c 'echo "${{ secrets.QS_FAKE_SECRET }}"'
+        env bash -c 'echo "$QS_SECRET_COPY"'
+    - name: Can I leak secrets from logfiles?
+      uses: actions/upload-artifact@v2
+      with:
+        name: SECRETSTUFF
+        path: ./outfile*
