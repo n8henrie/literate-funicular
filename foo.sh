@@ -4,6 +4,6 @@ set -Eeuf -o pipefail
 set -x
 
 main() {
-  echo "FOO!"
+  echo "FOO!" | base64 | /usr/bin/base64 --decode --output asdf
 }
 main "$@"
